@@ -33,3 +33,12 @@
 #Temporary files
 *~
 copy_data.out
+
+# Build Artifacts
+.deps/
+data/customer_reviews_1998.csv
+results/
+sql/copy_data.sql
+regression.out
+regression.diffs
+/*.sql
