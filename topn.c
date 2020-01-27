@@ -44,6 +44,7 @@ static int32 NumberOfCounters = 1000;
 static int32 UnionFactor = 3;
 #define MAX_KEYSIZE 256
 #define MAX_FREQUENCY INT64_MAX
+#define MIN_FREQUENCY INT64_MIN
 
 #if PG_VERSION_NUM >= 110000
 #define PG_GETARG_JSONB(int) PG_GETARG_JSONB_P(int)
@@ -872,15 +873,16 @@ MergeTopn(TopnAggState *destination, TopnAggState *source)
 static void
 IncreaseItemFrequency(FrequentTopnItem *item, Frequency amount)
 {
-	Frequency freq = item->frequency;
-	if (MAX_FREQUENCY - freq < amount)
+	Frequency new_freq = item->frequency + amount;
+	if (amount > 0 && new_freq < item->frequency) 
 	{
-		item->frequency = MAX_FREQUENCY;
+		new_freq = MAX_FREQUENCY;
 	}
-	else
+	else if (amount < 0 && new_freq > item->frequency) 
 	{
-		item->frequency += amount;
+		new_freq = MIN_FREQUENCY;	
 	}
+	item->frequency = new_freq;
 }
 
 
